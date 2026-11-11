@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UNICAL TALK // E.U.B. TRASMISSIONE 001</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Permanent+Marker&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #060608;
+      --panel-bg: rgba(12, 12, 16, 0.94);
+      --red-primary: #ff003c;
+      --red-glow: rgba(255, 0, 60, 0.4);
+      --green-glow: #00ff66;
+      --text-main: #e0e0e6;
+      --text-muted: #6e6e82;
+      --font-mono: 'Fira Code', 'Share Tech Mono', monospace;
+      --font-graffiti: 'Permanent Marker', cursive;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 15px;
+      overflow-x: hidden;
+      position: relative;
+    }
+    
+    .bg-watermark {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100vw; height: 100vh;
+      pointer-events: none; z-index: 0;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      opacity: 0.12; user-select: none;
+    }
+    .bg-watermark svg { width: 320px; height: 320px; fill: var(--red-primary); filter: drop-shadow(0 0 20px var(--red-primary)); }
+    .bg-watermark .eub-text { font-family: var(--font-graffiti); font-size: 5.5rem; color: var(--red-primary); letter-spacing: 10px; margin-top: -20px; }
+
+    .crt-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px; z-index: 99; pointer-events: none; opacity: 0.5;
+    }
+
+    header {
+      width: 100%; max-width: 750px; display: flex; justify-content: space-between;
+      align-items: center; border-bottom: 2px solid var(--red-primary);
+      padding-bottom: 10px; margin-bottom: 15px; z-index: 10; flex-wrap: wrap; gap: 10px;
+    }
+    .brand { font-family: var(--font-graffiti); font-size: 1.8rem; color: var(--red-primary); text-shadow: 0 0 10px var(--red-glow); cursor: pointer; }
+    .status-tag { background: #1a0008; border: 1px solid var(--red-primary); color: #ff6b8b; padding: 4px 10px; font-size: 0.8rem; border-radius: 4px; }
+    .btn-tool { background: rgba(0, 255, 102, 0.08); border: 1px solid var(--green-glow); color: var(--green-glow); padding: 6px 14px; font-family: var(--font-mono); font-size: 0.8rem; cursor: pointer; border-radius: 4px; transition: 0.2s; box-shadow: 0 0 6px rgba(0,255,102,0.2); }
+    .btn-tool:hover { background: var(--green-glow); color: #000; }
+    
+    .hacker-msg { width: 100%; max-width: 750px; background: rgba(255, 0, 60, 0.08); border-left: 3px solid var(--red-primary); padding: 10px 14px; border-radius: 4px; margin-bottom: 20px; font-size: 0.82rem; color: #ff8095; z-index: 10; }
+
+    .container { width: 100%; max-width: 750px; background: var(--panel-bg); border: 1px solid #22222e; border-radius: 8px; padding: 22px; box-shadow: 0 0 35px rgba(0,0,0,0.9); position: relative; z-index: 10; }
+    .node-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed #2a2a38; padding-bottom: 8px; }
+    .node-title { color: var(--red-primary); font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .node-step { color: var(--text-muted); font-size: 0.85rem; }
+    .puzzle-text { font-size: 0.9rem; line-height: 1.5; color: #ccc; margin-bottom: 15px; }
+    .code-block { background: #030305; border-left: 3px solid var(--red-primary); padding: 14px; font-family: var(--font-mono); color: #ff335c; margin: 12px 0; font-size: 0.9rem; word-break: break-all; letter-spacing: 1px; }
+    .input-group { display: flex; gap: 10px; margin-top: 18px; }
+    input[type="text"] { flex: 1; background: #000; border: 1px solid #333; color: #fff; padding: 10px 14px; font-family: var(--font-mono); font-size: 0.95rem; border-radius: 4px; outline: none; }
+    input[type="text"]:focus { border-color: var(--red-primary); box-shadow: 0 0 8px var(--red-glow); }
+    button.btn-submit { background: var(--red-primary); color: #fff; border: none; padding: 10px 22px; font-family: var(--font-mono); font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+    button.btn-submit:hover { background: #d60032; box-shadow: 0 0 12px var(--red-glow); }
+    .feedback { margin-top: 12px; font-size: 0.85rem; min-height: 18px; font-weight: bold; }
+    .feedback.error { color: #ff3333; }
+    .audio-panel { background: #0a0a10; border: 1px solid #20202e; padding: 12px; border-radius: 6px; text-align: center; margin: 12px 0; }
+    canvas#audioWave { width: 100%; height: 50px; background: #000; border-radius: 4px; margin-top: 8px; }
+    
+    /* Victory Panel Stylings */
+    .victory-card { background: rgba(0, 255, 102, 0.03); border: 1px solid var(--green-glow); padding: 20px; border-radius: 8px; box-shadow: 0 0 20px rgba(0,255,102,0.15); margin-bottom: 15px; }
+    .token-box { background: #001a08; border: 2px dashed var(--green-glow); color: var(--green-glow); font-size: 1.4rem; text-align: center; padding: 16px; font-weight: bold; letter-spacing: 2px; margin: 15px 0; border-radius: 6px; text-shadow: 0 0 12px rgba(0,255,102,0.5); }
+    .hacker-quote { background: #1a0008; border-left: 3px solid var(--red-primary); padding: 12px; margin: 15px 0; font-style: italic; color: #ff99ab; font-size: 0.88rem; line-height: 1.4; }
+    
+    .btn-jumpscare { background: transparent; border: 1px solid var(--red-primary); color: #ff335c; padding: 12px 15px; font-family: var(--font-mono); font-weight: bold; width: 100%; margin-top: 12px; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+    .btn-jumpscare:hover { background: rgba(255,0,60,0.15); color: #fff; }
+
+    footer { width: 100%; max-width: 750px; display: flex; justify-content: space-between; margin-top: 15px; font-size: 0.78rem; color: var(--text-muted); z-index: 10; }
+    .footer-btn { background: none; border: none; color: var(--text-muted); font-family: var(--font-mono); cursor: pointer; text-decoration: underline; }
+    .footer-btn:hover { color: var(--red-primary); }
+
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
+    .modal.active { display: flex; }
+    .modal-content { background: #0f0f14; border: 1px solid var(--red-primary); width: 100%; max-width: 480px; padding: 20px; border-radius: 8px; font-family: var(--font-mono); position: relative; }
+    
+    /* Terminal Video Player Container (Safe, Non-Strobe) */
+    .video-modal-content { background: #000; border: 2px solid var(--red-primary); width: 100%; max-width: 420px; padding: 15px; border-radius: 8px; font-family: var(--font-mono); text-align: center; }
+    canvas#terminalVideo { width: 100%; height: 240px; background: #050508; border-radius: 4px; border: 1px solid #222; }
+  </style>
+</head>
+<body>
+  <div class="crt-overlay"></div>
+  
+  <div class="bg-watermark">
+    <svg viewBox="0 0 100 100">
+      <path d="M50,10 L75,35 L65,85 L35,85 L25,35 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="40" cy="45" r="4"/>
+      <circle cx="60" cy="45" r="4"/>
+      <line x1="35" y1="65" x2="65" y2="65" stroke="currentColor" stroke-width="2"/>
+    </svg>
+    <div class="eub-text">E.U.B.</div>
+  </div>
+
+  <header>
+    <div class="brand">UNICAL TALK</div>
+    <div class="status-tag" id="statusTag">E.U.B. // MERCOLEDÌ</div>
+    <button class="btn-tool" onclick="toggleModal('decoderModal')">🔧 DECODER TOOL</button>
+  </header>
+
+  <div class="hacker-msg">
+    💬 <strong>E.U.B.:</strong> Sei entrato nel terminale. Osserva attentamente, usa la testa ed esplora la pagina. Questa è solo la parte facile...
+  </div>
+
+  <main class="container" id="mainContainer">
+    <!-- NODI 1 - 4 -->
+    <div class="node-screen" id="node1">
+      <div class="node-header"><span class="node-title">NODO 01</span><span class="node-step">1 / 5</span></div>
+      <p class="puzzle-text">Il primo blocco binario intercettato lungo l'asse del campus.</p>
+      <div class="code-block">01000011 01010101 01000010 01001111 00110100 00110001 01000011</div>
+      <div class="input-group">
+        <input type="text" id="input1" placeholder="Risposta..." autocomplete="off">
+        <button class="btn-submit" onclick="checkAnswer(1, 'CUBO41C')">INVIA</button>
+      </div>
+      <div class="feedback" id="fb1"></div>
+    </div>
+
+    <div class="node-screen" id="node2" style="display:none;">
+      <div class="node-header"><span class="node-title">NODO 02</span><span class="node-step">2 / 5</span></div>
+      <p class="puzzle-text">Sigla ufficiale dell'Aula Magna + risultato dell'espressione.</p>
+      <div class="code-block">[AM] + [(50 x 2) + (16 / 4)]</div>
+      <div class="input-group">
+        <input type="text" id="input2" placeholder="Risposta..." autocomplete="off">
+        <button class="btn-submit" onclick="checkAnswer(2, 'AM104')">INVIA</button>
+      </div>
+      <div class="feedback" id="fb2"></div>
+    </div>
+
+    <div class="node-screen" id="node3" style="display:none;">
+      <div class="node-header"><span class="node-title">NODO 03</span><span class="node-step">3 / 5</span></div>
+      <p class="puzzle-text">Ruota il cifrario ed estrai il differenziale tra il Cubo 41 e il Cubo 18.</p>
+      <div class="code-block">ROT13: SVYBCBYV | Δ(41, 18)</div>
+      <div class="input-group">
+        <input type="text" id="input3" placeholder="Risposta..." autocomplete="off">
+        <button class="btn-submit" onclick="checkAnswer(3, 'FILOPOLI23')">INVIA</button>
+      </div>
+      <div class="feedback" id="fb3"></div>
+    </div>
+
+    <div class="node-screen" id="node4" style="display:none;">
+      <div class="node-header"><span class="node-title">NODO 04</span><span class="node-step">4 / 5</span></div>
+      <p class="puzzle-text">Frequenza spettrale. Ribalta il segnale speculare.</p>
+      <div class="audio-panel">
+        <button class="btn-tool" style="animation:none;" onclick="playAudioSignal()">🔊 SEGNALE AUDIO</button>
+        <canvas id="audioWave"></canvas>
+      </div>
+      <div class="code-block">E M A S E</div>
+      <div class="input-group">
+        <input type="text" id="input4" placeholder="Risposta..." autocomplete="off">
+        <button class="btn-submit" onclick="checkAnswer(4, 'ESAME')">INVIA</button>
+      </div>
+      <div class="feedback" id="fb4"></div>
+    </div>
+
+    <!-- NODO 5 (MASTER VAULT) -->
+    <div class="node-screen" id="node5" style="display:none;">
+      <div class="node-header"><span class="node-title">NODO 05 // VAULT</span><span class="node-step">5 / 5</span></div>
+      <p class="puzzle-text">Unisci le 4 chiavi riscontrate nei nodi con un trattino (-).</p>
+      <div class="code-block">[1]-[2]-[3]-[4]</div>
+      <div class="input-group">
+        <input type="text" id="input5" placeholder="Master key..." autocomplete="off">
+        <button class="btn-submit" onclick="checkFinalVault()">SBLOCCA</button>
+      </div>
+      <div class="feedback" id="fb5"></div>
+    </div>
+
+    <!-- SCHERMATA VITTORIA -->
+    <div class="node-screen" id="victoryScreen" style="display:none;">
+      <div class="victory-card">
+        <div class="node-header" style="border-color:var(--green-glow);">
+          <span class="node-title" style="color:var(--green-glow);">✓ MERCOLEDÌ // CAPITOLO 1 DECIFRATO</span>
+        </div>
+        <p class="puzzle-text">Hai completato tutti e 5 i nodi di trasmissione. Salva questo Token per accedere all'archivio di domani!</p>
+        
+        <div class="token-box">
+          NEXUS-UNICAL-001
+        </div>
+
+        <div class="hacker-quote">
+          💬 <strong>Messaggio cifrato da E.U.B.:</strong><br>
+          <em>"Bravi... avete dimostrato di saper usare la testa. Ma questa era soltanto la fase d'ingresso. Il vero file corrotto vi attende domani. Ci vediamo Giovedì."</em>
+        </div>
+
+        <div style="margin-top:15px;">
+          <input type="text" id="teamName" placeholder="Tuo Nickname Instagram" style="margin-bottom:10px;">
+          <button class="btn-submit" style="width:100%; background:var(--green-glow); color:#000;" onclick="copyBadge()">COPIA BADGE E INVIA IN DM A @UNICALTALK</button>
+        </div>
+      </div>
+
+      <!-- Pulsante Mini-Video / Feed Cifrato Safe -->
+      <button class="btn-jumpscare" onclick="openTerminalVideo()">📹 RIPRODUCI FEED SEGRETO E.U.B.</button>
+    </div>
+  </main>
+
+  <footer>
+    <span>UNICAL TALK // E.U.B.</span>
+    <button class="footer-btn" onclick="toggleModal('logModal')">📁 LOG SEGRETO</button>
+  </footer>
+
+  <!-- MODAL DECODER -->
+  <div class="modal" id="decoderModal">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h3 style="color:var(--green-glow); font-size:0.95rem;">🔧 DECODER TOOL</h3>
+        <button class="btn-tool" style="animation:none;" onclick="toggleModal('decoderModal')">✕</button>
+      </div>
+      <select id="decodeType">
+        <option value="bin">Binario ➔ Testo</option>
+        <option value="rot13">ROT13 Cifrario</option>
+      </select>
+      <textarea id="decodeInput" rows="3" placeholder="Incolla il codice da decifrare..."></textarea>
+      <button class="btn-submit" style="width:100%; background:var(--green-glow); color:#000;" onclick="runDecoder()">DECODIFICA</button>
+      <div id="decodeResult" class="code-block" style="margin-top:10px; display:none; border-color:var(--green-glow); color:var(--green-glow);"></div>
+    </div>
+  </div>
+
+  <!-- MODAL LOG SEGRETO -->
+  <div class="modal" id="logModal">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="color:var(--red-primary); font-size:0.95rem;">📁 LOG #001</h3>
+        <button class="btn-tool" style="animation:none;" onclick="toggleModal('logModal')">✕</button>
+      </div>
+      <p style="font-size:0.82rem; color:#ccc; line-height:1.4;">
+        <em>"La mascotte è nascosta al termine della trasmissione di Sabato. Chi vuole trovarla deve raccogliere ogni singola chiave..."</em>
+      </p>
+      <p style="margin-top:8px; font-size:0.75rem; color:var(--red-primary);">- E.U.B.</p>
+    </div>
+  </div>
+
+  <!-- MODAL MINI-VIDEO TERMINAL FEED (SAFE & CINEMATIC) -->
+  <div class="modal" id="videoModal">
+    <div class="video-modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="color:var(--red-primary); font-size:0.85rem; font-weight:bold;">📡 LIVE FEED: E.U.B. FEED #001</span>
+        <button class="btn-tool" style="animation:none;" onclick="closeTerminalVideo()">✕ CHIUDI</button>
+      </div>
+      <canvas id="terminalVideo"></canvas>
+      <p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">TRANSMISSION ACTIVE // STAY TUNED FOR THURSDAY</p>
+    </div>
+  </div>
+
+  <script>
+    const keys = { 1: 'CUBO41C', 2: 'AM104', 3: 'FILOPOLI23', 4: 'ESAME' };
+
+    function checkAnswer(node, correctKey) {
+      const input = document.getElementById(`input${node}`).value.trim().toUpperCase();
+      const fb = document.getElementById(`fb${node}`);
+      if (input === correctKey) {
+        fb.className = 'feedback'; fb.style.color = '#00ff66'; fb.innerText = '✓ NODO SUPERATO';
+        playSynthBeep(880);
+        setTimeout(() => {
+          document.getElementById(`node${node}`).style.display = 'none';
+          document.getElementById(`node${node + 1}`).style.display = 'block';
+        }, 600);
+      } else {
+        fb.className = 'feedback error'; fb.innerText = '✕ CHIAVE ERRATA';
+        playSynthBeep(220);
+      }
+    }
+
+    function checkFinalVault() {
+      const input = document.getElementById('input5').value.trim().toUpperCase();
+      const expected = `${keys[1]}-${keys[2]}-${keys[3]}-${keys[4]}`;
+      const fb = document.getElementById('fb5');
+      if (input === expected) {
+        playSynthBeep(1200);
+        document.getElementById('node5').style.display = 'none';
+        document.getElementById('victoryScreen').style.display = 'block';
+      } else {
+        fb.className = 'feedback error'; fb.innerText = '✕ MASTER KEY ERRATA';
+        playSynthBeep(150);
+      }
+    }
+
+    /* Safe Canvas Video Simulation */
+    let videoAnimId = null;
+    function openTerminalVideo() {
+      document.getElementById('videoModal').classList.add('active');
+      const canvas = document.getElementById('terminalVideo');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 380; canvas.height = 240;
+      let angle = 0;
+
+      function render() {
+        ctx.fillStyle = 'rgba(5, 5, 8, 0.2)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Radar Circle Scan
+        ctx.strokeStyle = '#ff003c'; ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(190, 120, 70, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(190, 120);
+        ctx.arc(190, 120, 70, angle, angle + 0.3);
+        ctx.fillStyle = 'rgba(255, 0, 60, 0.2)';
+        ctx.fill();
+
+        // Soft Terminal Data Stream
+        ctx.fillStyle = '#00ff66'; ctx.font = '10px monospace';
+        ctx.fillText(`EUB_STREAM_${Math.floor(Math.random()*9000+1000)}`, 20, 30);
+        ctx.fillText(`STATUS: MONITORING CAMPUS`, 20, 45);
+        ctx.fillText(`TOKEN: NEXUS-UNICAL-001`, 20, 210);
+
+        angle += 0.04;
+        videoAnimId = requestAnimationFrame(render);
+      }
+      render();
+    }
+
+    function closeTerminalVideo() {
+      document.getElementById('videoModal').classList.remove('active');
+      if(videoAnimId) cancelAnimationFrame(videoAnimId);
+    }
+
+    function playSynthBeep(freq) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine'; osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 0.15);
+      } catch(e){}
+    }
+
+    function playAudioSignal() {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.4);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + 0.8);
+
+      const canvas = document.getElementById('audioWave');
+      const c = canvas.getContext('2d');
+      c.clearRect(0, 0, canvas.width, canvas.height);
+      c.strokeStyle = '#ff003c'; c.lineWidth = 2; c.beginPath();
+      for(let x=0; x<canvas.width; x+=5) {
+        let y = (canvas.height/2) + Math.sin(x*0.15) * 18 * (Math.random()*0.4 + 0.6);
+        if(x===0) c.moveTo(x,y); else c.lineTo(x,y);
+      }
+      c.stroke();
+    }
+
+    function copyBadge() {
+      const name = document.getElementById('teamName').value.trim() || 'Investigatore Unical';
+      const text = `🕵️‍♂️ E.U.B. // TRASMISSIONE 001 (MERCOLEDÌ)\nSquadra: ${name}\nStatus: Risolto ✓\nToken Giovedì: NEXUS-UNICAL-001`;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Badge copiato! Inoltralo ora nei DM di @unicaltalk!');
+      });
+    }
+
+    function toggleModal(id) {
+      document.getElementById(id).classList.toggle('active');
+    }
+
+    function runDecoder() {
+      const type = document.getElementById('decodeType').value;
+      const val = document.getElementById('decodeInput').value.trim();
+      const resBox = document.getElementById('decodeResult');
+      resBox.style.display = 'block';
+      if (type === 'bin') {
+        try {
+          resBox.innerText = val.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+        } catch(e) { resBox.innerText = 'Errore binario.'; }
+      } else if (type === 'rot13') {
+        resBox.innerText = val.replace(/[a-zA-Z]/g, c => String.fromCharCode((c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26));
+      }
+    }
+  </script>
+</body>
+</html>
